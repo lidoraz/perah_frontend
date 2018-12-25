@@ -9,8 +9,10 @@ export default class Register extends React.Component {
     gender: "",
     sexual_oreintation: "",
     race: "",
-    profession: ""
+    profession: "",
+    status: null
   };
+  fname = null;
 
   change = e => {
     this.props.onChange({ [e.target.name]: e.target.value });
@@ -30,10 +32,17 @@ export default class Register extends React.Component {
         // console.log(response);
         // var res = JSON.parse(response);
         console.log(response.data);
+        this.setState({
+          status:
+            "Welcome " + this.fname + "! <br/> You now can login with your ID!"
+        });
       })
       .catch(error => {
         console.log("Failed :()");
         console.log(error.data);
+        this.setState({
+          status: "Error occured!"
+        });
       });
   };
 
@@ -43,6 +52,7 @@ export default class Register extends React.Component {
 
     this.sumbitForm(params);
     // this.props.onSubmit(this.state);
+    this.fname = this.state.fname;
     this.setState({
       user_id: "",
       fname: "",
@@ -97,21 +107,28 @@ export default class Register extends React.Component {
         />
         <br />
         <br />
-        {/* <label>
-          Pick your favorite flavor:
-          <select value={this.state.value} onChange={this.handleChange}>
-            <option value="grapefruit">Grapefruit</option>
-            <option value="lime">Lime</option>
-            <option value="coconut">Coconut</option>
-            <option value="mango">Mango</option>
-          </select>
-        </label> */}
+        Gender?
         <input
+          type="radio"
+          value="Male"
+          name="gender"
+          onChange={e => this.change(e)}
+        />
+        Man
+        <input
+          type="radio"
+          value="Female"
+          name="gender"
+          onChange={e => this.change(e)}
+        />
+        Woman
+        {/* <input
           name="gender"
           placeholder="Gender? Male/Female"
           value={this.state.gender}
           onChange={e => this.change(e)}
-        />
+        /> */}
+        <br />
         <br />
         <input
           name="sexual_oreintation"
@@ -137,6 +154,8 @@ export default class Register extends React.Component {
         />
         <br />
         <button onClick={e => this.onSubmit(e)}>Register</button>
+        <br />
+        <h2>{this.state.status}</h2>
       </form>
     );
   }
