@@ -21,7 +21,7 @@ export default class Register extends React.Component {
   sumbitForm = params => {
     console.log("handleClick Success!");
     // console.log(params);
-    let url = "http://localhost:8080/reg";
+    let url = "http://35.176.94.224:8080/reg";
     axios
       .get(url, {
         params
