@@ -47,7 +47,7 @@ export default class Session extends React.Component {
     // console.log(event.target);
   };
   getAndStartSessionFromBackend = params => {
-    let url = "http://localhost:8080/sess";
+    let url = "http://35.176.94.224:8080/sess";
     axios
       .get(url, { params })
       .then(sessionData => {
@@ -102,7 +102,7 @@ export default class Session extends React.Component {
   };
 
   sendRatingToBackend = params => {
-    let url = "http://localhost:8080/rate";
+    let url = "http://35.176.94.224:8080/rate";
     axios
       .get(url, {
         params
