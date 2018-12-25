@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import StarRatings from "react-star-ratings";
+import GLOBAL_VARS from "./Consts";
 //export default
 // class Foo extends React.Component {
 //   state = {
@@ -47,7 +48,7 @@ export default class Session extends React.Component {
     // console.log(event.target);
   };
   getAndStartSessionFromBackend = params => {
-    let url = "http://35.176.94.224:8080/sess";
+    let url = GLOBAL_VARS.backendIP + "sess";
     axios
       .get(url, { params })
       .then(sessionData => {
@@ -102,7 +103,7 @@ export default class Session extends React.Component {
   };
 
   sendRatingToBackend = params => {
-    let url = "http://35.176.94.224:8080/rate";
+    let url = GLOBAL_VARS.backendIP + "rate";
     axios
       .get(url, {
         params

@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-
+import GLOBAL_VARS from "./Consts";
 export default class Register extends React.Component {
   state = {
     user_id: "",
@@ -21,7 +21,7 @@ export default class Register extends React.Component {
   sumbitForm = params => {
     console.log("handleClick Success!");
     // console.log(params);
-    let url = "http://35.176.94.224:8080/reg";
+    let url = GLOBAL_VARS.backendIP + "reg";
     axios
       .get(url, {
         params
