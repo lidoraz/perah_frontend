@@ -233,7 +233,7 @@ export default class Session extends React.Component {
               <img
                 name="currImage"
                 src={this.state.currImageSrc}
-                style={width: 40%}
+                width="50%"
                 // style={{ width: 100, height: 100 }}
               />
             )}
