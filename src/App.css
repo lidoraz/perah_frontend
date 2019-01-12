@@ -76,14 +76,18 @@
 @media (min-width: 320px) {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
   .sessionHolder {
-    /* float: center; */
-    /* width: 100px; */
+    position: relative;
   }
   .displayedImage {
     width: 300px;
   }
   .app-container {
     float: center;
+  }
+
+  .starSubmitContainer {
+    position: absolute;
+    bottom: 0;
   }
 }
 
@@ -99,5 +103,8 @@
   .app-container {
     float: center;
     margin: 5%;
+  }
+  .starSubmitContainer {
+    position: relative;
   }
 }
