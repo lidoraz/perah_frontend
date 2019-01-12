@@ -233,7 +233,7 @@ export default class Session extends React.Component {
   };
   render() {
     return (
-      <div name="holder">
+      <div class="sessionHolder">
         {this.state.user_id == null &&
           this.startSession(this.props.loggedUserId)}
         <div name="imagesHolder" />
@@ -251,9 +251,9 @@ export default class Session extends React.Component {
                 {/* {console.log("from imageholder:" + this.sessionType)} */}
                 {!this.state.isFinished &&
                 this.state.sessionType === "ATTRACTIVENESS" ? (
-                  <h1 style={{ color: "red" }}>How attractive?</h1>
+                  <h2 style={{ color: "red" }}>How attractive?</h2>
                 ) : (
-                  <h1 style={{ color: "green" }}>Would you give a loan to?</h1>
+                  <h2 style={{ color: "green" }}>Would you give a loan to?</h2>
                 )}
               </div>
               {this.state.currImageSrc && (
