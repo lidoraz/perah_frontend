@@ -68,10 +68,7 @@
   margin-left: 0px;
   font-size: 72px;
 }
-.centered {
-  float: center;
-  margin: 5%;
-}
+
 .displayedImage {
   width: 400px;
 }
@@ -100,6 +97,9 @@
   .displayedImage {
     width: 300px;
   }
+  .centered {
+    float: center;
+  }
 }
 
 @media (min-width: 600px) {
@@ -110,5 +110,9 @@
   }
   .displayedImage {
     width: 400px;
+  }
+  .centered {
+    float: center;
+    margin: 5%;
   }
 }
