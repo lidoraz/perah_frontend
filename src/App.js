@@ -40,13 +40,15 @@ class App extends Component {
               <div>
                 <h1>Welcome to Perah App!</h1>
                 <h2>Login or register to start</h2>
-                <Login
-                  setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
-                />
-
-                <Register
-                  onregistered={inputUserId => this.registered(inputUserId)}
-                />
+                <div class="loginRegisterContainer">
+                  <Login
+                    setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
+                  />
+                  <br />
+                  <Register
+                    onregistered={inputUserId => this.registered(inputUserId)}
+                  />
+                </div>
               </div>
             ) : (
               <div>

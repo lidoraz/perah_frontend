@@ -50,8 +50,6 @@ export default class Login extends React.Component {
               <button class="button" onClick={e => this.onSubmitLogin(e)}>
                 Submit
               </button>
-              <br />
-              {/* <div>{this.state.responseData.toString()}</div> */}
             </form>
           </div>
         ) : (

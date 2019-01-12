@@ -154,7 +154,7 @@ export default class Session extends React.Component {
           } else {
             this.localSessionData = null;
             this.setState({
-              sessionStatus: "Finished Session, enter ID for more!",
+              sessionStatus: "Finished Session. Thank you!",
               currLocInSession: 0,
               sessionType: null,
               isLoggedIn: false,
@@ -240,7 +240,11 @@ export default class Session extends React.Component {
         {console.log(
           "Rendered: currentState in page:" + this.state.sessionType
         )}
-        <p>{this.state.sessionStatus}</p>
+        <h3>{this.state.sessionStatus}</h3>
+        {this.state.isFinished && (
+          <h4>Finished Session. Click on the button below for more!</h4>
+        )}
+
         {this.state.hello ? (
           <h1>Hello {this.state.user_id}!</h1>
         ) : (

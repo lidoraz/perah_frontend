@@ -78,8 +78,8 @@
   font-size: 72px;
 }
 
-.displayedImage {
-  width: 400px;
+.loginRegisterContainer {
+  margin: 1em;
 }
 
 @media (min-width: 320px) {
