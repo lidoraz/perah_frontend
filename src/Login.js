@@ -47,13 +47,17 @@ export default class Login extends React.Component {
                 value={this.state.user_id}
                 onChange={e => this.change(e)}
               />
-              <button onClick={e => this.onSubmitLogin(e)}>Submit</button>
+              <button class="button" onClick={e => this.onSubmitLogin(e)}>
+                Submit
+              </button>
               <br />
               {/* <div>{this.state.responseData.toString()}</div> */}
             </form>
           </div>
         ) : (
-          <button onClick={e => this.showLogin(e)}>Login</button>
+          <button class="button" onClick={e => this.showLogin(e)}>
+            Login
+          </button>
         )}
       </div>
     );

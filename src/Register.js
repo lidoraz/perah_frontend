@@ -84,7 +84,9 @@ export default class Register extends React.Component {
     return (
       <div>
         {this.state.registerStatus == 0 && (
-          <button onClick={e => this.showRegister(e)}>Register</button>
+          <button class="button" onClick={e => this.showRegister(e)}>
+            Register
+          </button>
         )}
         <div className="registerForm">
           {this.state.registerStatus == 1 && (
@@ -162,7 +164,7 @@ export default class Register extends React.Component {
                 />
                 <br />
                 <br />
-                <button onClick={e => this.onSubmit(e)}>
+                <button class="button" onClick={e => this.onSubmit(e)}>
                   Click to Register
                 </button>
                 <br />

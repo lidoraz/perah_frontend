@@ -256,36 +256,39 @@ export default class Session extends React.Component {
                   <h2 style={{ color: "green" }}>Would you give a loan?</h2>
                 )}
               </div>
-              {this.state.currImageSrc && (
-                <img
-                  name="currImage"
-                  src={this.state.currImageSrc}
-                  class="displayedImage"
+              <div class="imgContainer">
+                {this.state.currImageSrc && (
+                  <img
+                    name="currImage"
+                    src={this.state.currImageSrc}
+                    class="displayedImage"
+                  />
+                )}
+              </div>
+              <div class="starSubmitContainer">
+                <StarRatings
+                  rating={this.state.rating}
+                  starRatedColor="gold"
+                  starHoverColor="gold"
+                  changeRating={this.changeRating}
+                  onStarHover={this.onStarHover.bind(this)}
+                  numberOfStars={5}
+                  name="rating"
                 />
-              )}
-              <br />
-              <StarRatings
-                rating={this.state.rating}
-                starRatedColor="gold"
-                starHoverColor="gold"
-                changeRating={this.changeRating}
-                onStarHover={this.onStarHover.bind(this)}
-                numberOfStars={5}
-                name="rating"
-              />
-              <br />
-              <form>
-                <button
-                  onClick={e => this.onSubmitRating(e)}
-                  className={
-                    this.state.sessionType === "ATTRACTIVENESS"
-                      ? "submitRatingButtonA"
-                      : "submitRatingButtonL"
-                  }
-                >
-                  Rate!
-                </button>
-              </form>
+
+                <form>
+                  <button
+                    onClick={e => this.onSubmitRating(e)}
+                    className={
+                      this.state.sessionType === "ATTRACTIVENESS"
+                        ? "submitRatingButtonA"
+                        : "submitRatingButtonL"
+                    }
+                  >
+                    Rate!
+                  </button>
+                </form>
+              </div>
             </div>
           )
         )}

@@ -56,6 +56,13 @@
   height: 40px;
   width: 200px;
 }
+.button {
+  /* background-color: white; */
+
+  /* color: black; */
+  font-size: 13px;
+  height: 30px;
+}
 .submitRatingButtonA {
   background-color: red;
   border: none;
@@ -75,19 +82,33 @@
 
 @media (min-width: 320px) {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
-  .sessionHolder {
+  /* .sessionHolder {
     position: relative;
+  } */
+
+  h2 {
+    margin: 0 !important;
+    padding: 0 !important;
   }
   .displayedImage {
     width: 300px;
   }
   .app-container {
     float: center;
+    margin: 0%;
   }
 
+  .h2 {
+    margin: 0;
+  }
+  /*needed to display the star and rate button on mobile phones*/
   .starSubmitContainer {
-    position: absolute;
-    bottom: 0;
+    height: 95px;
+    position: fixed;
+    bottom: 0%;
+    width: 100%;
+    background-color: white;
+    opacity: 1;
   }
 }
 
@@ -99,6 +120,15 @@
   }
   .displayedImage {
     width: 400px;
+  }
+  h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em !important;
+    margin-block-end: 0.83em !important;
+    margin-inline-start: 0px !important;
+    margin-inline-end: 0px !important;
+    font-weight: bold;
   }
   .app-container {
     float: center;
