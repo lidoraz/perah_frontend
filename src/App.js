@@ -12,15 +12,6 @@ class App extends Component {
     userId: null,
     hello: true
   };
-
-  onChange = updatedValue => {
-    this.setState({
-      fields: {
-        ...this.state.fields,
-        ...updatedValue
-      }
-    });
-  };
   loggedIn = inputUserId => {
     this.setState({
       isLoggedIn: true,
@@ -29,13 +20,14 @@ class App extends Component {
     // this.state.isLoggedIn = true;
     console.log("CLICKED ON SUBMIT from login!" + inputUserId);
     console.log("CLICKED ON SUBMIT from login!" + this.state.userId);
-    setTimeout(() => {
-      // show hello, then start session
-      this.setState({
-        hello: false
-      });
-    }, 2000);
   };
+  // registered = inputUserId => {
+  //   loggedIn(inputUserId);
+  //   this.setState({
+  //     isLoggedIn: true,
+  //     userId: inputUserId
+  //   });
+  // };
   render() {
     return (
       <div className="App">
@@ -44,19 +36,18 @@ class App extends Component {
           <div>
             {!this.state.isLoggedIn ? (
               <div>
+                <h1>Welcome to Perah App!</h1>
+                <h2>login or register to start</h2>
                 <Login
                   setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
                 />
-                <Register onChange={fields => this.onChange(fields)} />
-                <p>{JSON.stringify(this.state.fields, null, 2)}</p>
+                <Register
+                  onregistered={inputUserId => this.registered(inputUserId)}
+                />
               </div>
             ) : (
               <div>
-                {this.state.hello ? (
-                  <h1>Hello {this.state.userId}!</h1>
-                ) : (
-                  <Session loggedUserId={this.state.userId} />
-                )}
+                <Session loggedUserId={this.state.userId} />
               </div>
             )}
           </div>

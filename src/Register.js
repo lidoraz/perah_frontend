@@ -10,21 +10,19 @@ export default class Register extends React.Component {
     sexual_oreintation: "",
     race: "",
     profession: "",
+
     status: null,
-    isLoggedIn: false,
-    showRegister: false
+    registerStatus: 0
   };
-  fname = null;
 
   change = e => {
-    this.props.onChange({ [e.target.name]: e.target.value });
     this.setState({
       [e.target.name]: e.target.value
     });
   };
   sumbitForm = params => {
-    console.log("handleClick Success!");
-    // console.log(params);
+    console.log("sumbitForm");
+    console.log(params);
     let url = GLOBAL_VARS.backendIP + "reg";
     axios
       .get(url, {
@@ -33,17 +31,41 @@ export default class Register extends React.Component {
       .then(response => {
         // console.log(response);
         // var res = JSON.parse(response);
-        console.log(response.data);
-        this.setState({
-          status:
-            "Welcome " + this.fname + "! \nYou now can login with your ID!"
-        });
+        let result = response.data;
+        console.log("response.data:" + response.data);
+        switch (result) {
+          case 0:
+            this.setState({
+              status:
+                "Welcome " +
+                this.state.fname +
+                "! \nYou now can login with your ID: " +
+                this.state.user_id,
+              registerStatus: 2
+            });
+            break;
+          case -1:
+            this.setState({
+              status: "User named " + this.fname + " is already registerd"
+            });
+            break;
+          case -2:
+            this.setState({
+              status: "One or more of the parameters are missing"
+            });
+            break;
+          default:
+            this.setState({
+              status: "Unkown error occured"
+            });
+        }
       })
       .catch(error => {
         console.log("Failed :()");
         console.log(error.data);
         this.setState({
-          status: "Error occured!"
+          status:
+            "Error occured, Are one of the parameters are missing or incorrect?"
         });
       });
   };
@@ -51,47 +73,24 @@ export default class Register extends React.Component {
   onSubmit = e => {
     e.preventDefault();
     let params = this.state;
-
     this.sumbitForm(params);
-    // this.props.onSubmit(this.state);
-    this.fname = this.state.fname;
-    this.setState(
-      {
-        user_id: "",
-        fname: "",
-        lname: "",
-        dob: "",
-        gender: "",
-        sexual_oreintation: "",
-        race: "",
-        profession: ""
-      }
-      // this.props.setLoggedIn()
-    );
-    this.props.onChange({
-      user_id: "",
-      fname: "",
-      lname: "",
-      dob: "",
-      gender: "",
-      sexual_oreintation: "",
-      race: "",
-      profession: ""
-    });
   };
   showRegister = e => {
-    this.setState({ showRegister: true });
+    this.setState({ registerStatus: 1 });
     console.log("register clicked!");
   };
 
   render() {
     return (
       <div>
-        {/* <button onClick={e => this.showRegister(e)}>Register</button> */}
+        {this.state.registerStatus == 0 && (
+          <button onClick={e => this.showRegister(e)}>Register</button>
+        )}
         <div className="registerForm">
-          {this.state.showRegister ? (
+          {this.state.registerStatus == 1 && (
             <div className="regContainer">
-              <h2>Register!</h2>
+              <h2>Perah register file</h2>
+              <h4>Please make sure to fill up all your details correctly</h4>
               <form>
                 <input
                   name="user_id"
@@ -137,17 +136,11 @@ export default class Register extends React.Component {
                   onChange={e => this.change(e)}
                 />
                 Woman
-                {/* <input
-          name="gender"
-          placeholder="Gender? Male/Female"
-          value={this.state.gender}
-          onChange={e => this.change(e)}
-        /> */}
                 <br />
                 <br />
                 <input
                   name="sexual_oreintation"
-                  placeholder="Like Men / Woman?"
+                  placeholder="Like Woman / Men?"
                   value={this.state.sexual_oreintation}
                   onChange={e => this.change(e)}
                 />
@@ -168,18 +161,16 @@ export default class Register extends React.Component {
                   onChange={e => this.change(e)}
                 />
                 <br />
+                <br />
                 <button onClick={e => this.onSubmit(e)}>
                   Click to Register
                 </button>
                 <br />
-                <h2>{this.state.status}</h2>
               </form>
             </div>
-          ) : (
-            <button onClick={e => this.showRegister(e)}>Register</button>
           )}
-          <h1>this is a title</h1>
         </div>
+        <h2>{this.state.status}</h2>
       </div>
     );
   }

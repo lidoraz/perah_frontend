@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import StarRatings from "react-star-ratings";
-import StarRatingComponent from "react-star-rating-component";
+// import StarRatingComponent from "react-star-rating-component";
 
 import GLOBAL_VARS from "./Consts";
 //export default
@@ -20,10 +20,11 @@ export default class Session extends React.Component {
     timeBefore: 0,
     rating: -1,
     timesUncertain: -1,
-    sessionStatus: "you must be logged in to see this",
+    sessionStatus: null,
     isFinished: false,
     isLoggedIn: false,
-    sessionType: null
+    sessionType: null,
+    hello: false
   };
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
   sessionNum = 0;
@@ -39,40 +40,57 @@ export default class Session extends React.Component {
 
   change = event => {
     console.log("got input:" + event.target.value);
-    // this.setState({
-    //   sessionType: event.target.value
-    // });
-    // console.log("state:" + this.state.sessionType);
     this.setState({
       user_id: event.target.value,
       currRating: event.target.value
     });
     // console.log(event.target);
   };
-  getAndStartSessionFromBackend = params => {
+  startSessionWithSessionData = sessionData => {
+    this.localSessionData = sessionData.data; //update local session data
+    console.log(
+      "SessionType: " +
+        this.localSessionData.sessionType +
+        " ;#images: " +
+        this.localSessionData.imagesPath.length
+    );
+    this.setState({
+      sessionType: this.localSessionData.sessionType,
+      sessionStatus: "",
+      currImageSrc: this.localSessionData.imagesPath[0],
+      currLocInSession: 0,
+      timeBefore: Date.now()
+    });
+    // setInterval()
+  };
+  getSessionFromBackend = params => {
     let url = GLOBAL_VARS.backendIP + "sess";
     axios
       .get(url, { params })
       .then(sessionData => {
-        console.log("SessionId: " + sessionData.data.sessionId);
-        if (!this.state.isLoggedIn) {
-          this.setState({ isLoggedIn: true });
+        if (sessionData.data.sessionId == -1) {
+          this.setState({
+            sessionStatus: "User is not registered, refresh page to re-enter id"
+          });
+        } else {
+          console.log("SessionId: " + sessionData.data.sessionId);
+          if (!this.state.isLoggedIn) {
+            //first time hello
+            this.setState({ isLoggedIn: true });
+            console.log("then: this.state.user_id:" + this.state.user_id);
+            setTimeout(() => {
+              this.startSessionWithSessionData(sessionData);
+              this.setState({
+                hello: false
+              });
+            }, 2000);
+            this.setState({
+              hello: true
+            });
+          } else {
+            this.startSessionWithSessionData(sessionData);
+          }
         }
-
-        this.localSessionData = sessionData.data; //update local session data
-        console.log(
-          "SessionType: " +
-            this.localSessionData.sessionType +
-            " ;#images: " +
-            this.localSessionData.imagesPath.length
-        );
-        this.setState({
-          sessionType: this.localSessionData.sessionType,
-          sessionStatus: "",
-          currImageSrc: this.localSessionData.imagesPath[0],
-          currLocInSession: 0,
-          timeBefore: Date.now()
-        });
       })
       .catch(error => {
         console.log("Failed :()");
@@ -92,22 +110,8 @@ export default class Session extends React.Component {
         " ; type=" +
         params["type"]
     );
-    this.getAndStartSessionFromBackend(params);
+    this.getSessionFromBackend(params);
   };
-  // onSubmitLogin = e => {
-  //   e.preventDefault();
-
-  //   let params = {};
-  //   params["user_id"] = this.state.user_id;
-  //   let local = null;
-  //   if (Math.random() > 0.5) {
-  //     local = this.tasks[0];
-  //   } else {
-  //     local = this.tasks[1];
-  //   }
-  //   console.log(local);
-  //   this.getSessionByType(local);
-  // };
 
   sendRatingToBackend = params => {
     let url = GLOBAL_VARS.backendIP + "rate";
@@ -146,7 +150,7 @@ export default class Session extends React.Component {
               this.setState({
                 sessionType: nextSessionType
               });
-            }, 2000);
+            }, 3000);
           } else {
             this.localSessionData = null;
             this.setState({
@@ -218,7 +222,14 @@ export default class Session extends React.Component {
       local = this.tasks[1];
     }
     params["type"] = local;
-    this.getAndStartSessionFromBackend(params);
+    this.getSessionFromBackend(params);
+  };
+  restartSession = e => {
+    console.log("restartSession" + this.state.user_id);
+    this.setState({
+      isFinished: false
+    });
+    this.startSession(this.state.user_id);
   };
   render() {
     return (
@@ -230,49 +241,56 @@ export default class Session extends React.Component {
           "Rendered: currentState in page:" + this.state.sessionType
         )}
         <p>{this.state.sessionStatus}</p>
-        {!this.state.isFinished && this.state.sessionType && (
-          <div>
+        {this.state.hello ? (
+          <h1>Hello {this.state.user_id}!</h1>
+        ) : (
+          !this.state.isFinished &&
+          this.state.sessionType && (
             <div>
-              {/* {console.log("from imageholder:" + this.sessionType)} */}
-              {!this.state.isFinished &&
-              this.state.sessionType === "ATTRACTIVENESS" ? (
-                <h1 style={{ color: "red" }}>How attractive?</h1>
-              ) : (
-                <h1 style={{ color: "green" }}>Would you give a loan to?</h1>
+              <div>
+                {/* {console.log("from imageholder:" + this.sessionType)} */}
+                {!this.state.isFinished &&
+                this.state.sessionType === "ATTRACTIVENESS" ? (
+                  <h1 style={{ color: "red" }}>How attractive?</h1>
+                ) : (
+                  <h1 style={{ color: "green" }}>Would you give a loan to?</h1>
+                )}
+              </div>
+              {this.state.currImageSrc && (
+                <img
+                  name="currImage"
+                  src={this.state.currImageSrc}
+                  class="displayedImage"
+                />
               )}
-            </div>
-            {this.state.currImageSrc && (
-              <img
-                name="currImage"
-                src={this.state.currImageSrc}
-                class="displayedImage"
+              <br />
+              <StarRatings
+                rating={this.state.rating}
+                starRatedColor="gold"
+                starHoverColor="gold"
+                changeRating={this.changeRating}
+                onStarHover={this.onStarHover.bind(this)}
+                numberOfStars={5}
+                name="rating"
               />
-            )}
-
-            <br />
-            <StarRatings
-              rating={this.state.rating}
-              starRatedColor="gold"
-              starHoverColor="gold"
-              changeRating={this.changeRating}
-              onStarHover={this.onStarHover.bind(this)}
-              numberOfStars={5}
-              name="rating"
-            />
-            <br />
-            <form>
-              <button
-                onClick={e => this.onSubmitRating(e)}
-                className={
-                  this.state.sessionType === "ATTRACTIVENESS"
-                    ? "submitRatingButtonA"
-                    : "submitRatingButtonL"
-                }
-              >
-                Rate!
-              </button>
-            </form>
-          </div>
+              <br />
+              <form>
+                <button
+                  onClick={e => this.onSubmitRating(e)}
+                  className={
+                    this.state.sessionType === "ATTRACTIVENESS"
+                      ? "submitRatingButtonA"
+                      : "submitRatingButtonL"
+                  }
+                >
+                  Rate!
+                </button>
+              </form>
+            </div>
+          )
+        )}
+        {this.state.isFinished && (
+          <button onClick={e => this.restartSession(e)}>Rate more!</button>
         )}
       </div>
     );
