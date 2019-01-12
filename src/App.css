@@ -64,3 +64,14 @@
   height: 40px;
   width: 200px;
 }
+.rating-stars {
+  margin-left: 0px;
+  font-size: 72px;
+}
+.centered {
+  float: center;
+  margin: 5%;
+}
+.displayedImage {
+  width: 400px;
+}
