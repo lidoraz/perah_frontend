@@ -6,6 +6,9 @@ import Session from "./Session";
 import Login from "./Login";
 
 class App extends Component {
+  componentDidMount() {
+    document.title = "Perah";
+  }
   state = {
     fields: {},
     isLoggedIn: false,

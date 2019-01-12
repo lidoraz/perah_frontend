@@ -293,7 +293,9 @@ export default class Session extends React.Component {
           )
         )}
         {this.state.isFinished && (
-          <button onClick={e => this.restartSession(e)}>Rate more!</button>
+          <button class="button" onClick={e => this.restartSession(e)}>
+            Rate more!
+          </button>
         )}
       </div>
     );

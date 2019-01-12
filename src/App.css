@@ -55,6 +55,7 @@
   font-size: 16px;
   height: 40px;
   width: 200px;
+  margin-top: 10px;
 }
 .button {
   /* background-color: white; */
@@ -70,6 +71,7 @@
   font-size: 16px;
   height: 40px;
   width: 200px;
+  margin-top: 10px;
 }
 .rating-stars {
   margin-left: 0px;
@@ -103,7 +105,7 @@
   }
   /*needed to display the star and rate button on mobile phones*/
   .starSubmitContainer {
-    height: 95px;
+    height: 115px;
     position: fixed;
     bottom: 0%;
     width: 100%;
