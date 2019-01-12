@@ -31,16 +31,16 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <br />
-        <div class="centered">
+        <div class="app-container">
           <div>
             {!this.state.isLoggedIn ? (
               <div>
                 <h1>Welcome to Perah App!</h1>
-                <h2>login or register to start</h2>
+                <h2>Login or register to start</h2>
                 <Login
                   setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
                 />
+
                 <Register
                   onregistered={inputUserId => this.registered(inputUserId)}
                 />

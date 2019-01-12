@@ -251,9 +251,9 @@ export default class Session extends React.Component {
                 {/* {console.log("from imageholder:" + this.sessionType)} */}
                 {!this.state.isFinished &&
                 this.state.sessionType === "ATTRACTIVENESS" ? (
-                  <h2 style={{ color: "red" }}>How attractive?</h2>
+                  <h2 style={{ color: "red" }}>How Attractive?</h2>
                 ) : (
-                  <h2 style={{ color: "green" }}>Would you give a loan to?</h2>
+                  <h2 style={{ color: "green" }}>Would you give a loan?</h2>
                 )}
               </div>
               {this.state.currImageSrc && (
