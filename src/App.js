@@ -3,10 +3,14 @@ import React, { Component } from "react";
 import "./App.css";
 import Register from "./Register";
 import Session from "./Session";
+import Login from "./Login";
 
 class App extends Component {
   state = {
-    fields: {}
+    fields: {},
+    isLoggedIn: false,
+    userId: null,
+    hello: true
   };
 
   onChange = updatedValue => {
@@ -17,18 +21,44 @@ class App extends Component {
       }
     });
   };
-
+  loggedIn = inputUserId => {
+    this.setState({
+      isLoggedIn: true,
+      userId: inputUserId
+    });
+    // this.state.isLoggedIn = true;
+    console.log("CLICKED ON SUBMIT from login!" + inputUserId);
+    console.log("CLICKED ON SUBMIT from login!" + this.state.userId);
+    setTimeout(() => {
+      // show hello, then start session
+      this.setState({
+        hello: false
+      });
+    }, 2000);
+  };
   render() {
     return (
       <div className="App">
         <br />
-        <div class="row">
-          <div class="column">
-            <Register onChange={fields => this.onChange(fields)} />
-            <p>{JSON.stringify(this.state.fields, null, 2)}</p>
-          </div>
-          <div class="column">
-            <Session onChange={fields => this.onChange(fields)} />
+        <div class="centered">
+          <div>
+            {!this.state.isLoggedIn ? (
+              <div>
+                <Login
+                  setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
+                />
+                <Register onChange={fields => this.onChange(fields)} />
+                <p>{JSON.stringify(this.state.fields, null, 2)}</p>
+              </div>
+            ) : (
+              <div>
+                {this.state.hello ? (
+                  <h1>Hello {this.state.userId}!</h1>
+                ) : (
+                  <Session loggedUserId={this.state.userId} />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

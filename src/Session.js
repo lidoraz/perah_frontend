@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
 import StarRatings from "react-star-ratings";
+import StarRatingComponent from "react-star-rating-component";
+
 import GLOBAL_VARS from "./Consts";
 //export default
 // class Foo extends React.Component {
@@ -12,11 +14,11 @@ import GLOBAL_VARS from "./Consts";
 
 export default class Session extends React.Component {
   state = {
-    user_id: "",
+    user_id: null,
     currImageSrc: "",
     currLocInSession: 0,
     timeBefore: 0,
-    rating: 0,
+    rating: -1,
     timesUncertain: -1,
     sessionStatus: "you must be logged in to see this",
     isFinished: false,
@@ -74,8 +76,8 @@ export default class Session extends React.Component {
       })
       .catch(error => {
         console.log("Failed :()");
-        console.log(error);
         this.setState({
+          sessionStatus: "could not reach backend 404",
           responseData: error.toString()
         });
       });
@@ -84,23 +86,28 @@ export default class Session extends React.Component {
     let params = {};
     params["user_id"] = this.state.user_id;
     params["type"] = type;
-    console.log("getSessionByType: user_id= ${user_id} ; type= ${type}");
+    console.log(
+      "getSessionByType: user_id=" +
+        params["user_id"] +
+        " ; type=" +
+        params["type"]
+    );
     this.getAndStartSessionFromBackend(params);
   };
-  onSubmitLogin = e => {
-    e.preventDefault();
+  // onSubmitLogin = e => {
+  //   e.preventDefault();
 
-    let params = {};
-    params["user_id"] = this.state.user_id;
-    let local = null;
-    if (Math.random() > 0.5) {
-      local = this.tasks[0];
-    } else {
-      local = this.tasks[1];
-    }
-    console.log(local);
-    this.getSessionByType(local);
-  };
+  //   let params = {};
+  //   params["user_id"] = this.state.user_id;
+  //   let local = null;
+  //   if (Math.random() > 0.5) {
+  //     local = this.tasks[0];
+  //   } else {
+  //     local = this.tasks[1];
+  //   }
+  //   console.log(local);
+  //   this.getSessionByType(local);
+  // };
 
   sendRatingToBackend = params => {
     let url = GLOBAL_VARS.backendIP + "rate";
@@ -196,23 +203,28 @@ export default class Session extends React.Component {
       });
     }
   };
-
+  onStarHover(nextValue, prevValue, name) {
+    this.setState({ rating: nextValue });
+  }
+  startSession = userId => {
+    console.log("startSession" + userId);
+    this.setState({ user_id: userId });
+    let params = {};
+    params["user_id"] = userId;
+    let local = null;
+    if (Math.random() > 0.5) {
+      local = this.tasks[0];
+    } else {
+      local = this.tasks[1];
+    }
+    params["type"] = local;
+    this.getAndStartSessionFromBackend(params);
+  };
   render() {
     return (
       <div name="holder">
-        <div name="login">
-          <form>
-            <input
-              name="user_id"
-              placeholder="ID"
-              value={this.state.user_id}
-              onChange={e => this.change(e)}
-            />
-            <button onClick={e => this.onSubmitLogin(e)}>Submit</button>
-            <br />
-            {/* <div>{this.state.responseData.toString()}</div> */}
-          </form>
-        </div>
+        {this.state.user_id == null &&
+          this.startSession(this.props.loggedUserId)}
         <div name="imagesHolder" />
         {console.log(
           "Rendered: currentState in page:" + this.state.sessionType
@@ -233,8 +245,7 @@ export default class Session extends React.Component {
               <img
                 name="currImage"
                 src={this.state.currImageSrc}
-                width="50%"
-                // style={{ width: 100, height: 100 }}
+                class="displayedImage"
               />
             )}
 
@@ -244,6 +255,7 @@ export default class Session extends React.Component {
               starRatedColor="gold"
               starHoverColor="gold"
               changeRating={this.changeRating}
+              onStarHover={this.onStarHover.bind(this)}
               numberOfStars={5}
               name="rating"
             />
