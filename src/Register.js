@@ -83,13 +83,13 @@ export default class Register extends React.Component {
   render() {
     return (
       <div>
-        {this.state.registerStatus == 0 && (
-          <button class="button" onClick={e => this.showRegister(e)}>
+        {this.state.registerStatus === 0 && (
+          <button className="button" onClick={e => this.showRegister(e)}>
             Register
           </button>
         )}
         <div className="registerForm">
-          {this.state.registerStatus == 1 && (
+          {this.state.registerStatus === 1 && (
             <div className="regContainer">
               <h2>Perah register file</h2>
               <h4>Please make sure to fill up all your details correctly</h4>

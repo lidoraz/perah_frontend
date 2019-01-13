@@ -82,6 +82,22 @@
   margin: 1em;
 }
 
+.progress-bar {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  margin-left: 0px;
+  height: 10px;
+  width: 100%;
+  /* border: 1px solid #333; */
+}
+.filler {
+  background: yellowgreen;
+  height: 100%;
+  border-radius: inherit;
+  /* transition: width 1.1s ease-in; */
+}
+
 @media (min-width: 320px) {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
   /* .sessionHolder {
@@ -134,7 +150,7 @@
   }
   .app-container {
     float: center;
-    margin: 5%;
+    margin: 0%;
   }
   .starSubmitContainer {
     position: relative;

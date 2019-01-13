@@ -1,12 +1,4 @@
 import React from "react";
-import axios from "axios";
-//export default
-// class Foo extends React.Component {
-//   state = {
-//     rating: 0
-//   };
-
-// }
 
 export default class Login extends React.Component {
   state = {
@@ -47,13 +39,13 @@ export default class Login extends React.Component {
                 value={this.state.user_id}
                 onChange={e => this.change(e)}
               />
-              <button class="button" onClick={e => this.onSubmitLogin(e)}>
+              <button className="button" onClick={e => this.onSubmitLogin(e)}>
                 Submit
               </button>
             </form>
           </div>
         ) : (
-          <button class="button" onClick={e => this.showLogin(e)}>
+          <button className="button" onClick={e => this.showLogin(e)}>
             Login
           </button>
         )}

@@ -1,8 +1,7 @@
 import React from "react";
 import axios from "axios";
 import StarRatings from "react-star-ratings";
-// import StarRatingComponent from "react-star-rating-component";
-
+// import { ProgressBar } from "cjs-react-progressbar";
 import GLOBAL_VARS from "./Consts";
 //export default
 // class Foo extends React.Component {
@@ -11,6 +10,21 @@ import GLOBAL_VARS from "./Consts";
 //   };
 
 // }
+const Filler = props => {
+  return (
+    <div
+      className="filler"
+      style={{ width: props.percentage + "%", background: props.color }}
+    />
+  );
+};
+const ProgressBar = props => {
+  return (
+    <div className="progress-bar">
+      <Filler percentage={props.percentage} color={props.color} />
+    </div>
+  );
+};
 
 export default class Session extends React.Component {
   state = {
@@ -24,12 +38,22 @@ export default class Session extends React.Component {
     isFinished: false,
     isLoggedIn: false,
     sessionType: null,
-    hello: false
+    hello: false,
+    progressBarPercent: 0,
+    sessionColor: null
   };
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
   sessionNum = 0;
-
   localSessionData = null;
+  lastImageIndex = -1;
+  preloadImages = imgs => {
+    console.log("preloadImages " + imgs.length);
+    this.preloadedImages = [imgs.length];
+    for (var i = 0; i < imgs.length; i++) {
+      this.preloadedImages[i] = new Image();
+      this.preloadedImages[i].src = imgs[i];
+    }
+  };
 
   changeRating = (newRating, name) => {
     this.setState({
@@ -38,46 +62,120 @@ export default class Session extends React.Component {
     });
   };
 
-  change = event => {
-    console.log("got input:" + event.target.value);
+  setNewImage = imgIdx => {
+    console.log("Showing Image " + imgIdx + "/" + this.lastImageIndex);
     this.setState({
-      user_id: event.target.value,
-      currRating: event.target.value
+      currLocInSession: imgIdx,
+      timeBefore: Date.now(),
+      currImageSrc: this.localSessionData.imagesPath[imgIdx],
+      rating: 0,
+      timesUncertain: -1,
+      progressBarPercent: 0
     });
-    // console.log(event.target);
+  };
+  setNewSessionState = () => {
+    this.setState({
+      sessionType: this.localSessionData.sessionType,
+      sessionStatus: ""
+    });
+  };
+  ishandleNextSession = () => {
+    if (this.state.currLocInSession === this.lastImageIndex) {
+      console.log("FINISHED SESSION");
+      let lastSessionType = this.state.sessionType;
+      this.setState({
+        sessionStatus: "Great! next session is going to start..",
+        sessionType: null
+      });
+
+      //wait a while...
+      this.sessionNum += 1;
+      if (this.sessionNum < 2) {
+        setTimeout(() => {
+          // continue for second round
+          let nextSessionType =
+            lastSessionType === this.tasks[0] ? this.tasks[1] : this.tasks[0];
+          let nextSessionColor =
+            this.state.sessionColor === "green" ? "red" : "green";
+          this.getSessionByType(nextSessionType);
+          this.setState({
+            sessionType: nextSessionType,
+            sessionColor: nextSessionColor
+          });
+        }, 3000);
+      } else {
+        this.localSessionData = null;
+        this.lastImageIndex = -1;
+        this.setState({
+          sessionStatus: "Finished Session. Thank you!",
+          currLocInSession: -1,
+          sessionType: null,
+          isLoggedIn: false,
+          isFinished: true,
+          progressBarPercent: 0
+        });
+      }
+      // reset interval
+      if (GLOBAL_VARS.isTimeLimited) {
+        clearInterval(this.progressInterval);
+        console.log("clearInterval(this.progressInterval)");
+      }
+      return true;
+    }
+    return false;
   };
   startSessionWithSessionData = sessionData => {
-    this.localSessionData = sessionData.data; //update local session data
+    this.localSessionData = sessionData; //update local session data
+    this.lastImageIndex = this.localSessionData.imagesPath.length - 1;
     console.log(
       "SessionType: " +
         this.localSessionData.sessionType +
         " ;#images: " +
         this.localSessionData.imagesPath.length
     );
-    this.setState({
-      sessionType: this.localSessionData.sessionType,
-      sessionStatus: "",
-      currImageSrc: this.localSessionData.imagesPath[0],
-      currLocInSession: 0,
-      timeBefore: Date.now()
-    });
-    // setInterval()
+    this.setNewImage(0);
+    this.setNewSessionState();
+    let percentOF4Seconds = GLOBAL_VARS.timeLimit / 4;
+    if (GLOBAL_VARS.isTimeLimited) {
+      this.progressInterval = setInterval(() => {
+        let percent = this.state.progressBarPercent;
+        if (this.state.sessionType != null) {
+          if (percent === 100) {
+            // change pic
+            if (!this.ishandleNextSession()) {
+              this.setNewImage(this.state.currLocInSession + 1);
+            }
+          } else {
+            let newPercent = percent + 25;
+            // let newPercent = 50;
+            console.log("setInterval triggered, val:" + newPercent);
+            this.setState({
+              progressBarPercent: newPercent
+            });
+          }
+        }
+      }, percentOF4Seconds);
+    }
   };
+
   getSessionFromBackend = params => {
     let url = GLOBAL_VARS.backendIP + "sess";
     axios
       .get(url, { params })
-      .then(sessionData => {
-        if (sessionData.data.sessionId == -1) {
+      .then(result => {
+        let sessionData = result.data;
+        if (sessionData.sessionId === -1) {
           this.setState({
             sessionStatus: "User is not registered, refresh page to re-enter id"
           });
         } else {
-          console.log("SessionId: " + sessionData.data.sessionId);
+          console.log("SessionId: " + sessionData.sessionId);
+          this.preloadImages(sessionData.imagesPath); // preloading images
           if (!this.state.isLoggedIn) {
             //first time hello
             this.setState({ isLoggedIn: true });
             console.log("then: this.state.user_id:" + this.state.user_id);
+
             setTimeout(() => {
               this.startSessionWithSessionData(sessionData);
               this.setState({
@@ -126,41 +224,8 @@ export default class Session extends React.Component {
             " imgNum: " +
             this.state.currLocInSession
         );
-        if (
-          this.state.currLocInSession ===
-          this.localSessionData.imagesPath.length
-        ) {
-          console.log("FINISHED SESSION");
-          let lastSessionType = this.state.sessionType;
-          this.setState({
-            sessionStatus: "Great! next session is going to start..",
-            sessionType: null
-          });
-
-          //wait a while...
-          this.sessionNum += 1;
-          if (this.sessionNum < 2) {
-            setTimeout(() => {
-              // continue for second round
-              let nextSessionType =
-                lastSessionType === this.tasks[0]
-                  ? this.tasks[1]
-                  : this.tasks[0];
-              this.getSessionByType(nextSessionType);
-              this.setState({
-                sessionType: nextSessionType
-              });
-            }, 3000);
-          } else {
-            this.localSessionData = null;
-            this.setState({
-              sessionStatus: "Finished Session. Thank you!",
-              currLocInSession: 0,
-              sessionType: null,
-              isLoggedIn: false,
-              isFinished: true
-            });
-          }
+        if (!this.ishandleNextSession()) {
+          this.setNewImage(this.state.currLocInSession + 1);
         }
       })
       .catch(error => {
@@ -170,18 +235,13 @@ export default class Session extends React.Component {
         // this.onResponse(error.data);
       });
   };
-  onSubmitRating = e => {
-    e.preventDefault();
-    if (this.localSessionData == null || this.state.rating == 0) {
-      console.log("this.state.rating == 0");
-      return;
-    }
-    console.log("getRating(): " + this.state.rating);
-    // console.log(this.sessionData);
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///
+  // UPDATE BACKEND AND FRONTEND FOR THIS, CHANGE OR ADD NEW PARAMETER - DID SUBMIT HIS RATING?
+  createRating = didSubmit => {
     let ratingParmas = {};
     let timeAfter = Date.now();
     ratingParmas["s"] = this.state.sessionType;
-
     ratingParmas["photoId"] = this.state.currImageSrc.split("/")[
       this.state.currImageSrc.split("/").length - 1
     ];
@@ -194,17 +254,18 @@ export default class Session extends React.Component {
     ratingParmas["timeTook"] = timeAfter - this.state.timeBefore;
     ratingParmas["timesUncertain"] = this.state.timesUncertain;
     ratingParmas["phonePosition"] = 0;
+    console.log("gotRating: " + this.state.rating);
+    return ratingParmas;
+  };
+  onSubmitRating = e => {
+    e.preventDefault();
+    if (this.localSessionData === null || this.state.rating === 0) {
+      console.log("this.state.rating == 0");
+      return;
+    }
 
-    this.sendRatingToBackend(ratingParmas);
     if (this.localSessionData != null) {
-      let nextImg = this.state.currLocInSession + 1;
-      this.setState({
-        currLocInSession: nextImg,
-        timeBefore: Date.now(),
-        currImageSrc: this.localSessionData.imagesPath[nextImg],
-        rating: 0,
-        timesUncertain: -1
-      });
+      this.sendRatingToBackend(this.createRating(true));
     }
   };
   onStarHover(nextValue, prevValue, name) {
@@ -212,16 +273,19 @@ export default class Session extends React.Component {
   }
   startSession = userId => {
     console.log("startSession" + userId);
-    this.setState({ user_id: userId });
-    let params = {};
-    params["user_id"] = userId;
-    let local = null;
+    let local = null,
+      sessionColor;
     if (Math.random() > 0.5) {
       local = this.tasks[0];
+      sessionColor = "red";
     } else {
       local = this.tasks[1];
+      sessionColor = "green";
     }
+    let params = {};
+    params["user_id"] = userId;
     params["type"] = local;
+    this.setState({ user_id: userId, sessionColor: sessionColor });
     this.getSessionFromBackend(params);
   };
   restartSession = e => {
@@ -233,26 +297,26 @@ export default class Session extends React.Component {
   };
   render() {
     return (
-      <div class="sessionHolder">
+      <div className="sessionHolder">
         {this.state.user_id == null &&
           this.startSession(this.props.loggedUserId)}
-        <div name="imagesHolder" />
-        {console.log(
-          "Rendered: currentState in page:" + this.state.sessionType
-        )}
+
         <h3>{this.state.sessionStatus}</h3>
-        {this.state.isFinished && (
-          <h4>Finished Session. Click on the button below for more!</h4>
-        )}
+        {this.state.isFinished && <h4>Click on the button below for more!</h4>}
 
         {this.state.hello ? (
           <h1>Hello {this.state.user_id}!</h1>
         ) : (
           !this.state.isFinished &&
           this.state.sessionType && (
-            <div>
-              <div>
-                {/* {console.log("from imageholder:" + this.sessionType)} */}
+            <div className="innerSessionHolder">
+              <div className="progressBar">
+                <ProgressBar
+                  percentage={this.state.progressBarPercent}
+                  color={this.state.sessionColor}
+                />
+              </div>
+              <div className="taskTitle">
                 {!this.state.isFinished &&
                 this.state.sessionType === "ATTRACTIVENESS" ? (
                   <h2 style={{ color: "red" }}>How Attractive?</h2>
@@ -260,16 +324,18 @@ export default class Session extends React.Component {
                   <h2 style={{ color: "green" }}>Would you give a loan?</h2>
                 )}
               </div>
-              <div class="imgContainer">
+
+              <div className="imgContainer">
                 {this.state.currImageSrc && (
                   <img
                     name="currImage"
                     src={this.state.currImageSrc}
-                    class="displayedImage"
+                    className="displayedImage"
                   />
                 )}
               </div>
-              <div class="starSubmitContainer">
+
+              <div className="starSubmitContainer">
                 <StarRatings
                   rating={this.state.rating}
                   starRatedColor="gold"
@@ -297,7 +363,7 @@ export default class Session extends React.Component {
           )
         )}
         {this.state.isFinished && (
-          <button class="button" onClick={e => this.restartSession(e)}>
+          <button className="button" onClick={e => this.restartSession(e)}>
             Rate more!
           </button>
         )}
