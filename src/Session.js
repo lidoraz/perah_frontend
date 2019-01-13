@@ -11,17 +11,30 @@ import GLOBAL_VARS from "./Consts";
 
 // }
 const Filler = props => {
+  //"width 0.02s ease-in";
+  let transitionHard = "";
+  let transitionSmooth = "width " + GLOBAL_VARS.timeLimit + "ms ease-in";
+  let chosenTransition =
+    props.transition == "smooth" ? transitionSmooth : transitionHard;
   return (
     <div
       className="filler"
-      style={{ width: props.percentage + "%", background: props.color }}
+      style={{
+        width: props.percentage + "%",
+        background: props.color,
+        transition: chosenTransition
+      }}
     />
   );
 };
 const ProgressBar = props => {
   return (
     <div className="progress-bar">
-      <Filler percentage={props.percentage} color={props.color} />
+      <Filler
+        percentage={props.percentage}
+        color={props.color}
+        transition={props.transition}
+      />
     </div>
   );
 };
@@ -40,7 +53,8 @@ export default class Session extends React.Component {
     sessionType: null,
     hello: false,
     progressBarPercent: 0,
-    sessionColor: null
+    sessionColor: null,
+    progressBarTransition: "hard"
   };
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
   sessionNum = 0;
@@ -53,6 +67,21 @@ export default class Session extends React.Component {
       this.preloadedImages[i] = new Image();
       this.preloadedImages[i].src = imgs[i];
     }
+  };
+  showWaitingProgressBar = () => {
+    let colorBefore = this.state.sessionColor;
+    this.setState({
+      sessionColor: "Black",
+      progressBarPercent: 100,
+      progressBarTransition: "smooth"
+    });
+    setTimeout(() => {
+      this.setState({
+        sessionColor: colorBefore,
+        progressBarTransition: "hard",
+        progressBarPercent: 0
+      });
+    }, GLOBAL_VARS.timeLimit);
   };
 
   changeRating = (newRating, name) => {
@@ -85,9 +114,12 @@ export default class Session extends React.Component {
       let lastSessionType = this.state.sessionType;
       this.setState({
         sessionStatus: "Great! next session is going to start..",
-        sessionType: null
+        sessionColor: "Black",
+        sessionType: null,
+        progressBarPercent: 0
       });
 
+      this.showWaitingProgressBar();
       //wait a while...
       this.sessionNum += 1;
       if (this.sessionNum < 2) {
@@ -100,9 +132,10 @@ export default class Session extends React.Component {
           this.getSessionByType(nextSessionType);
           this.setState({
             sessionType: nextSessionType,
-            sessionColor: nextSessionColor
+            sessionColor: nextSessionColor,
+            progressBarPercent: 0
           });
-        }, 3000);
+        }, GLOBAL_VARS.timeLimit);
       } else {
         this.localSessionData = null;
         this.lastImageIndex = -1;
@@ -175,13 +208,13 @@ export default class Session extends React.Component {
             //first time hello
             this.setState({ isLoggedIn: true });
             console.log("then: this.state.user_id:" + this.state.user_id);
-
+            this.showWaitingProgressBar(GLOBAL_VARS.timeLimit - 3);
             setTimeout(() => {
               this.startSessionWithSessionData(sessionData);
               this.setState({
                 hello: false
               });
-            }, 2000);
+            }, GLOBAL_VARS.timeLimit - 2);
             this.setState({
               hello: true
             });
@@ -300,7 +333,13 @@ export default class Session extends React.Component {
       <div className="sessionHolder">
         {this.state.user_id == null &&
           this.startSession(this.props.loggedUserId)}
-
+        <div className="progressBar">
+          <ProgressBar
+            percentage={this.state.progressBarPercent}
+            color={this.state.sessionColor}
+            transition={this.state.progressBarTransition}
+          />
+        </div>
         <h3>{this.state.sessionStatus}</h3>
         {this.state.isFinished && <h4>Click on the button below for more!</h4>}
 
@@ -310,12 +349,6 @@ export default class Session extends React.Component {
           !this.state.isFinished &&
           this.state.sessionType && (
             <div className="innerSessionHolder">
-              <div className="progressBar">
-                <ProgressBar
-                  percentage={this.state.progressBarPercent}
-                  color={this.state.sessionColor}
-                />
-              </div>
               <div className="taskTitle">
                 {!this.state.isFinished &&
                 this.state.sessionType === "ATTRACTIVENESS" ? (
