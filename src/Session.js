@@ -57,7 +57,6 @@ export default class Session extends React.Component {
     progressBarTransition: "hard"
   };
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
-  sessionNum = 0;
   localSessionData = null;
   lastImageIndex = -1;
   preloadImages = imgs => {
@@ -81,7 +80,7 @@ export default class Session extends React.Component {
         progressBarTransition: "hard",
         progressBarPercent: 0
       });
-    }, GLOBAL_VARS.timeLimit);
+    }, GLOBAL_VARS.timeLimit - 2);
   };
 
   changeRating = (newRating, name) => {
@@ -97,7 +96,7 @@ export default class Session extends React.Component {
       currLocInSession: imgIdx,
       timeBefore: Date.now(),
       currImageSrc: this.localSessionData.imagesPath[imgIdx],
-      rating: 0,
+      rating: -1,
       timesUncertain: -1,
       progressBarPercent: 0
     });
@@ -110,19 +109,21 @@ export default class Session extends React.Component {
   };
   ishandleNextSession = () => {
     if (this.state.currLocInSession === this.lastImageIndex) {
-      console.log("FINISHED SESSION");
-      let lastSessionType = this.state.sessionType;
-      this.setState({
-        sessionStatus: "Great! next session is going to start..",
-        sessionColor: "Black",
-        sessionType: null,
-        progressBarPercent: 0
-      });
-
-      this.showWaitingProgressBar();
-      //wait a while...
+      // reset interval
+      if (GLOBAL_VARS.isTimeLimited) {
+        clearInterval(this.progressInterval);
+        console.log("clearInterval(this.progressInterval)");
+      }
       this.sessionNum += 1;
       if (this.sessionNum < 2) {
+        console.log("FINISHED SESSION");
+        let lastSessionType = this.state.sessionType;
+        this.setState({
+          sessionStatus: "Great! next session is going to start..",
+          currLocInSession: -1,
+          sessionType: null
+        });
+        this.showWaitingProgressBar();
         setTimeout(() => {
           // continue for second round
           let nextSessionType =
@@ -148,11 +149,7 @@ export default class Session extends React.Component {
           progressBarPercent: 0
         });
       }
-      // reset interval
-      if (GLOBAL_VARS.isTimeLimited) {
-        clearInterval(this.progressInterval);
-        console.log("clearInterval(this.progressInterval)");
-      }
+
       return true;
     }
     return false;
@@ -199,7 +196,8 @@ export default class Session extends React.Component {
         let sessionData = result.data;
         if (sessionData.sessionId === -1) {
           this.setState({
-            sessionStatus: "User is not registered, refresh page to re-enter id"
+            sessionStatus: "User is not registered, re-enter id",
+            user_id: -1
           });
         } else {
           console.log("SessionId: " + sessionData.sessionId);
@@ -262,10 +260,8 @@ export default class Session extends React.Component {
         }
       })
       .catch(error => {
-        console.log("Failed :()");
-        console.log(error);
-        this.setState({ responseData: error.toString() });
-        // this.onResponse(error.data);
+        console.log("Catched Error in sendRatingToBackend");
+        this.setState({ sessionStatus: error.toString() });
       });
   };
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,21 +269,28 @@ export default class Session extends React.Component {
   // UPDATE BACKEND AND FRONTEND FOR THIS, CHANGE OR ADD NEW PARAMETER - DID SUBMIT HIS RATING?
   createRating = didSubmit => {
     let ratingParmas = {};
-    let timeAfter = Date.now();
+    let d = new Date();
+    let ratingTimeStampWithTimeZoneOffset =
+      d.getTime() - d.getTimezoneOffset() * 60 * 1000;
     ratingParmas["s"] = this.state.sessionType;
     ratingParmas["photoId"] = this.state.currImageSrc.split("/")[
       this.state.currImageSrc.split("/").length - 1
     ];
     ratingParmas["user_id"] = this.localSessionData.userId;
     ratingParmas["ratingValue"] = this.state.rating;
-    ratingParmas["ratingUUID"] = timeAfter;
+    ratingParmas["ratingUUID"] = ratingTimeStampWithTimeZoneOffset;
     ratingParmas["session"] = this.localSessionData.sessionId;
     ratingParmas["iteration"] = this.localSessionData.iterationId;
     ratingParmas["locationInSession"] = this.state.currLocInSession;
-    ratingParmas["timeTook"] = timeAfter - this.state.timeBefore;
+    ratingParmas["timeTook"] = Date.now() - this.state.timeBefore;
     ratingParmas["timesUncertain"] = this.state.timesUncertain;
     ratingParmas["phonePosition"] = 0;
-    console.log("gotRating: " + this.state.rating);
+    console.log(
+      "sentRating- photoID:" +
+        ratingParmas["photoId"] +
+        " rating:" +
+        this.state.rating
+    );
     return ratingParmas;
   };
   onSubmitRating = e => {
@@ -304,8 +307,8 @@ export default class Session extends React.Component {
   onStarHover(nextValue, prevValue, name) {
     this.setState({ rating: nextValue });
   }
-  startSession = userId => {
-    console.log("startSession" + userId);
+  startSessions = userId => {
+    console.log("startSessions" + userId);
     let local = null,
       sessionColor;
     if (Math.random() > 0.5) {
@@ -318,21 +321,26 @@ export default class Session extends React.Component {
     let params = {};
     params["user_id"] = userId;
     params["type"] = local;
-    this.setState({ user_id: userId, sessionColor: sessionColor });
-    this.getSessionFromBackend(params);
-  };
-  restartSession = e => {
-    console.log("restartSession" + this.state.user_id);
     this.setState({
+      user_id: userId,
+      sessionColor: sessionColor,
       isFinished: false
     });
-    this.startSession(this.state.user_id);
+    this.sessionNum = 0;
+    this.getSessionFromBackend(params);
+  };
+  restartSessions = e => {
+    console.log("restartSessions" + this.state.user_id);
+    this.startSessions(this.state.user_id);
+  };
+  refreshPage = e => {
+    window.location.reload();
   };
   render() {
     return (
       <div className="sessionHolder">
         {this.state.user_id == null &&
-          this.startSession(this.props.loggedUserId)}
+          this.startSessions(this.props.loggedUserId)}
         <div className="progressBar">
           <ProgressBar
             percentage={this.state.progressBarPercent}
@@ -341,6 +349,11 @@ export default class Session extends React.Component {
           />
         </div>
         <h3>{this.state.sessionStatus}</h3>
+        {this.state.user_id === -1 && (
+          <button className="button" onClick={e => this.refreshPage(e)}>
+            Try again
+          </button>
+        )}
         {this.state.isFinished && <h4>Click on the button below for more!</h4>}
 
         {this.state.hello ? (
@@ -396,7 +409,7 @@ export default class Session extends React.Component {
           )
         )}
         {this.state.isFinished && (
-          <button className="button" onClick={e => this.restartSession(e)}>
+          <button className="button" onClick={e => this.restartSessions(e)}>
             Rate more!
           </button>
         )}
