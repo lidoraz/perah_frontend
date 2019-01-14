@@ -51,14 +51,14 @@ export default class Session extends React.Component {
     isFinished: false,
     isLoggedIn: false,
     sessionType: null,
-    hello: false,
+    showHello: false,
     progressBarPercent: 0,
     sessionColor: null,
     progressBarTransition: "hard"
   };
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
   localSessionData = null;
-  lastImageIndex = -1;
+  lastImageIndexSession = -1;
   preloadImages = imgs => {
     console.log("preloadImages " + imgs.length);
     this.preloadedImages = [imgs.length];
@@ -91,7 +91,7 @@ export default class Session extends React.Component {
   };
 
   setNewImage = imgIdx => {
-    console.log("Showing Image " + imgIdx + "/" + this.lastImageIndex);
+    console.log("Showing Image " + imgIdx + "/" + this.lastImageIndexSession);
     this.setState({
       currLocInSession: imgIdx,
       timeBefore: Date.now(),
@@ -107,61 +107,72 @@ export default class Session extends React.Component {
       sessionStatus: ""
     });
   };
-  ishandleNextSession = () => {
-    if (this.state.currLocInSession === this.lastImageIndex) {
-      // reset interval
-      if (GLOBAL_VARS.isTimeLimited) {
-        clearInterval(this.progressInterval);
-        console.log("clearInterval(this.progressInterval)");
-      }
-      this.sessionNum += 1;
-      if (this.sessionNum < 2) {
-        console.log("FINISHED SESSION");
-        let lastSessionType = this.state.sessionType;
-        this.setState({
-          sessionStatus: "Great! next session is going to start..",
-          currLocInSession: -1,
-          sessionType: null
-        });
-        this.showWaitingProgressBar();
-        setTimeout(() => {
-          // continue for second round
-          let nextSessionType =
-            lastSessionType === this.tasks[0] ? this.tasks[1] : this.tasks[0];
-          let nextSessionColor =
-            this.state.sessionColor === "green" ? "red" : "green";
-          this.getSessionByType(nextSessionType);
-          this.setState({
-            sessionType: nextSessionType,
-            sessionColor: nextSessionColor,
-            progressBarPercent: 0
-          });
-        }, GLOBAL_VARS.timeLimit);
-      } else {
-        this.localSessionData = null;
-        this.lastImageIndex = -1;
-        this.setState({
-          sessionStatus: "Finished Session. Thank you!",
-          currLocInSession: -1,
-          sessionType: null,
-          isLoggedIn: false,
-          isFinished: true,
-          progressBarPercent: 0
-        });
-      }
-
+  resetSessionState = () => {
+    this.localSessionData = null;
+    this.lastImageIndexSession = -1;
+    this.setState({
+      currImageSrc: null,
+      sessionType: null,
+      progressBarPercent: 0,
+      currLocInSession: -1
+    });
+  };
+  hasFinishedSession = () => {
+    if (this.state.currLocInSession === this.lastImageIndexSession) {
       return true;
     }
     return false;
   };
+  handleNextSession = () => {
+    // reset interval
+    if (GLOBAL_VARS.isTimeLimited) {
+      clearInterval(this.progressInterval);
+      console.log("clearInterval(this.progressInterval)");
+    }
+    this.sessionNum += 1;
+    if (this.sessionNum < 2) {
+      console.log("FINISHED SESSION");
+      let lastSessionType = this.state.sessionType;
+      this.resetSessionState();
+      this.setState({
+        sessionStatus: "Great! next session is going to start.."
+      });
+      this.showWaitingProgressBar();
+      setTimeout(() => {
+        // continue for second round
+        let nextSessionType =
+          lastSessionType === this.tasks[0] ? this.tasks[1] : this.tasks[0];
+        let nextSessionColor =
+          this.state.sessionColor === "green" ? "red" : "green";
+        this.getSessionByType(nextSessionType);
+        this.setState({
+          sessionType: nextSessionType,
+          sessionColor: nextSessionColor,
+          progressBarPercent: 0
+        });
+      }, GLOBAL_VARS.timeLimit);
+    } else {
+      this.resetSessionState();
+      this.setState({
+        sessionStatus: "Finished Session. Thank you!",
+        isLoggedIn: false,
+        isFinished: true
+      });
+    }
+  };
+  setNewImageOrGetNextSession = () => {
+    this.hasFinishedSession()
+      ? this.handleNextSession()
+      : this.setNewImage(this.state.currLocInSession + 1);
+  };
   startSessionWithSessionData = sessionData => {
     this.localSessionData = sessionData; //update local session data
-    this.lastImageIndex = this.localSessionData.imagesPath.length - 1;
+    this.lastImageIndexSession = this.localSessionData.imagesPath.length - 1;
     console.log(
-      "SessionType: " +
-        this.localSessionData.sessionType +
-        " ;#images: " +
-        this.localSessionData.imagesPath.length
+      "SessionType:",
+      this.localSessionData.sessionType,
+      " ;#images:",
+      this.localSessionData.imagesPath.length
     );
     this.setNewImage(0);
     this.setNewSessionState();
@@ -169,16 +180,15 @@ export default class Session extends React.Component {
     if (GLOBAL_VARS.isTimeLimited) {
       this.progressInterval = setInterval(() => {
         let percent = this.state.progressBarPercent;
+        // if need to skip interval
         if (this.state.sessionType != null) {
           if (percent === 100) {
             // change pic
-            if (!this.ishandleNextSession()) {
-              this.setNewImage(this.state.currLocInSession + 1);
-            }
+            this.setNewImageOrGetNextSession();
           } else {
             let newPercent = percent + 25;
             // let newPercent = 50;
-            console.log("setInterval triggered, val:" + newPercent);
+            console.log("setInterval triggered, val:", newPercent);
             this.setState({
               progressBarPercent: newPercent
             });
@@ -200,21 +210,21 @@ export default class Session extends React.Component {
             user_id: -1
           });
         } else {
-          console.log("SessionId: " + sessionData.sessionId);
+          console.log("SessionId: ", sessionData.sessionId);
           this.preloadImages(sessionData.imagesPath); // preloading images
           if (!this.state.isLoggedIn) {
-            //first time hello
+            //first time showHello
             this.setState({ isLoggedIn: true });
-            console.log("then: this.state.user_id:" + this.state.user_id);
+            console.log("then: this.state.user_id:", this.state.user_id);
             this.showWaitingProgressBar(GLOBAL_VARS.timeLimit - 3);
             setTimeout(() => {
               this.startSessionWithSessionData(sessionData);
               this.setState({
-                hello: false
+                showHello: false
               });
             }, GLOBAL_VARS.timeLimit - 2);
             this.setState({
-              hello: true
+              showHello: true
             });
           } else {
             this.startSessionWithSessionData(sessionData);
@@ -224,8 +234,7 @@ export default class Session extends React.Component {
       .catch(error => {
         console.log("Failed :()");
         this.setState({
-          sessionStatus: "could not reach backend 404",
-          responseData: error.toString()
+          sessionStatus: "could not reach backend 404"
         });
       });
   };
@@ -234,10 +243,10 @@ export default class Session extends React.Component {
     params["user_id"] = this.state.user_id;
     params["type"] = type;
     console.log(
-      "getSessionByType: user_id=" +
-        params["user_id"] +
-        " ; type=" +
-        params["type"]
+      "getSessionByType: user_id=",
+      params["user_id"],
+      " ; type=",
+      params["type"]
     );
     this.getSessionFromBackend(params);
   };
@@ -250,17 +259,15 @@ export default class Session extends React.Component {
       })
       .then(rateResponse => {
         console.log(
-          "rateResponse: " +
-            rateResponse.data +
-            " imgNum: " +
-            this.state.currLocInSession
+          "rateResponse: ",
+          rateResponse.data,
+          " imgNum: ",
+          this.state.currLocInSession
         );
-        if (!this.ishandleNextSession()) {
-          this.setNewImage(this.state.currLocInSession + 1);
-        }
+        this.setNewImageOrGetNextSession();
       })
       .catch(error => {
-        console.log("Catched Error in sendRatingToBackend");
+        console.log("Error in sendRatingToBackend");
         this.setState({ sessionStatus: error.toString() });
       });
   };
@@ -286,10 +293,10 @@ export default class Session extends React.Component {
     ratingParmas["timesUncertain"] = this.state.timesUncertain;
     ratingParmas["phonePosition"] = 0;
     console.log(
-      "sentRating- photoID:" +
-        ratingParmas["photoId"] +
-        " rating:" +
-        this.state.rating
+      "sentRating- photoID:",
+      ratingParmas["photoId"],
+      " rating:",
+      this.state.rating
     );
     return ratingParmas;
   };
@@ -353,7 +360,7 @@ export default class Session extends React.Component {
         )}
         {this.state.isFinished && <h4>Click on the button below for more!</h4>}
 
-        {this.state.hello ? (
+        {this.state.showHello ? (
           <h1>Hello {this.state.user_id}!</h1>
         ) : (
           !this.state.isFinished &&
