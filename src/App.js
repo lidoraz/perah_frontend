@@ -26,26 +26,28 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div className="app-container">
-          {!this.state.isLoggedIn ? (
-            <div>
-              <h1>Welcome to Perah App!</h1>
-              <h2>Login or register to start</h2>
-              <div className="loginRegisterContainer">
-                <Login
-                  setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
-                />
-                <br />
-                <Register
-                  onregistered={inputUserId => this.registered(inputUserId)}
-                />
+        <div className="noselect">
+          <div className="app-container">
+            {!this.state.isLoggedIn ? (
+              <div>
+                <h1>Welcome to Perah App!</h1>
+                <h2>Login or register to start</h2>
+                <div className="loginRegisterContainer">
+                  <Login
+                    setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
+                  />
+                  <br />
+                  <Register
+                    onregistered={inputUserId => this.registered(inputUserId)}
+                  />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div>
-              <Session loggedUserId={this.state.userId} />
-            </div>
-          )}
+            ) : (
+              <div>
+                <Session loggedUserId={this.state.userId} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );

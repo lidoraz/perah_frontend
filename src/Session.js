@@ -295,14 +295,11 @@ export default class Session extends React.Component {
   };
   onSubmitRating = e => {
     e.preventDefault();
-    if (this.localSessionData === null || this.state.rating === 0) {
-      console.log("this.state.rating == 0");
+    if (this.localSessionData === null || this.state.rating === -1) {
+      console.log("this.state.rating === -1");
       return;
     }
-
-    if (this.localSessionData != null) {
-      this.sendRatingToBackend(this.createRating(true));
-    }
+    this.sendRatingToBackend(this.createRating(true));
   };
   onStarHover(nextValue, prevValue, name) {
     this.setState({ rating: nextValue });
