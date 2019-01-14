@@ -91,83 +91,140 @@ export default class Register extends React.Component {
         <div className="registerForm">
           {this.state.registerStatus === 1 && (
             <div className="regContainer">
-              <h2>Perah register file</h2>
               <h4>Please make sure to fill up all your details correctly</h4>
               <form>
-                <input
-                  name="user_id"
-                  placeholder="ID"
-                  value={this.state.user_id}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <input
-                  name="fname"
-                  placeholder="First Name"
-                  value={this.state.fname}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <input
-                  name="lname"
-                  placeholder="Last Name"
-                  value={this.state.lname}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <input
-                  name="dob"
-                  placeholder="Date of Birth?"
-                  value={this.state.dob}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <br />
-                Gender?
-                <input
-                  type="radio"
-                  value="Male"
-                  name="gender"
-                  onChange={e => this.change(e)}
-                />
-                Man
-                <input
-                  type="radio"
-                  value="Female"
-                  name="gender"
-                  onChange={e => this.change(e)}
-                />
-                Woman
-                <br />
-                <br />
-                <input
-                  name="sexual_oreintation"
-                  placeholder="Like Woman / Men?"
-                  value={this.state.sexual_oreintation}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <input
-                  name="race"
-                  type="race"
-                  placeholder="Race"
-                  value={this.state.race}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <input
-                  name="profession"
-                  type="profession"
-                  placeholder="What do you do? student etc.."
-                  value={this.state.profession}
-                  onChange={e => this.change(e)}
-                />
-                <br />
-                <br />
-                <button class="button" onClick={e => this.onSubmit(e)}>
-                  Click to Register
-                </button>
-                <br />
+                <div class="divTable">
+                  <div class="divTableBody">
+                    <div class="divTableRow">
+                      <div class="divTableCell">Your ID</div>
+                      <div class="divTableCell">
+                        <input
+                          name="user_id"
+                          type="number"
+                          min="010000000"
+                          max="999999999"
+                          placeholder="ID"
+                          value={this.state.user_id}
+                          onChange={e => this.change(e)}
+                        />
+                      </div>
+                    </div>
+                    <div class="divTableRow">
+                      <div class="divTableCell">First Name</div>
+                      <div class="divTableCell">
+                        <input
+                          name="fname"
+                          type="text"
+                          placeholder="First Name"
+                          value={this.state.fname}
+                          onChange={e => this.change(e)}
+                        />
+                      </div>
+                    </div>
+                    <div class="divTableRow">
+                      <div class="divTableCell">Last Name</div>
+                      <div class="divTableCell">
+                        <input
+                          name="lname"
+                          type="text"
+                          placeholder="Last Name"
+                          value={this.state.lname}
+                          onChange={e => this.change(e)}
+                        />
+                      </div>
+                    </div>
+                    <div class="divTableRow">
+                      <div class="divTableCell">Year of Birth</div>
+                      <div class="divTableCell">
+                        <input
+                          name="dob"
+                          type="number"
+                          min="1900"
+                          max="2010"
+                          placeholder="1994"
+                          value={this.state.dob}
+                          onChange={e => this.change(e)}
+                        />
+                      </div>
+                    </div>
+                    <div class="divTableRow">
+                      <div class="divTableCell">Gender?</div>
+                      <div class="divTableCell">
+                        <input
+                          type="radio"
+                          value="Male"
+                          name="gender"
+                          onChange={e => this.change(e)}
+                        />
+                        Man
+                        <input
+                          type="radio"
+                          value="Female"
+                          name="gender"
+                          onChange={e => this.change(e)}
+                        />
+                        Woman
+                      </div>
+                    </div>
+                    <div class="divTableRow">
+                      <div class="divTableCell">Like Women / Men?</div>
+                      <div class="divTableCell">
+                        <input
+                          type="radio"
+                          value="Women"
+                          name="sexual_oreintation"
+                          onChange={e => this.change(e)}
+                        />
+                        Women
+                        <input
+                          type="radio"
+                          value="Men"
+                          name="sexual_oreintation"
+                          onChange={e => this.change(e)}
+                        />
+                        Men
+                        <input
+                          type="radio"
+                          value="Both"
+                          name="sexual_oreintation"
+                          onChange={e => this.change(e)}
+                        />
+                        Both!
+                      </div>
+                    </div>
+
+                    <div class="divTableRow">
+                      <div class="divTableCell">Parents from?</div>
+                      <div class="divTableCell">
+                        <input
+                          name="race"
+                          type="text"
+                          placeholder="Poland, Iraq, Morroco, etc.."
+                          value={this.state.race}
+                          onChange={e => this.change(e)}
+                        />
+                      </div>
+                    </div>
+                    <div class="divTableRow">
+                      <div class="divTableCell">What do you do?</div>
+                      <div class="divTableCell">
+                        <input
+                          name="profession"
+                          type="text"
+                          placeholder="Student/Lecturer/etc.."
+                          value={this.state.profession}
+                          onChange={e => this.change(e)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="divTableRowCentered">
+                  <button class="button" onClick={e => this.onSubmit(e)}>
+                    Click to Register
+                  </button>
+                </div>
               </form>
             </div>
           )}

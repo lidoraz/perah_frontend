@@ -36,6 +36,9 @@ export default class Login extends React.Component {
               <input
                 name="user_id"
                 placeholder="ID"
+                type="number"
+                min="010000000"
+                max="999999999"
                 value={this.state.user_id}
                 onChange={e => this.change(e)}
               />
