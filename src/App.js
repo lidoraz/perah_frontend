@@ -26,27 +26,33 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <script type="text/javascript">
+          {(document.oncontextmenu = new Function("return false;"))}
+          {(document.onselectstart = new Function("return false;"))}
+        </script>
         <div className="noselect">
-          <div className="app-container">
-            {!this.state.isLoggedIn ? (
-              <div>
-                <h1>Welcome to Perah App!</h1>
-                <h2>Login or register to start</h2>
-                <div className="loginRegisterContainer">
-                  <Login
-                    setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
-                  />
-                  <br />
-                  <Register
-                    onregistered={inputUserId => this.registered(inputUserId)}
-                  />
+          <div className="disabledrag">
+            <div className="app-container">
+              {!this.state.isLoggedIn ? (
+                <div>
+                  <h1>Welcome to Perah App!</h1>
+                  <h2>Login or register to start</h2>
+                  <div className="loginRegisterContainer">
+                    <Login
+                      setLoggedIn={inputUserId => this.loggedIn(inputUserId)}
+                    />
+                    <br />
+                    <Register
+                      onregistered={inputUserId => this.registered(inputUserId)}
+                    />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div>
-                <Session loggedUserId={this.state.userId} />
-              </div>
-            )}
+              ) : (
+                <div>
+                  <Session loggedUserId={this.state.userId} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

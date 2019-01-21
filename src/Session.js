@@ -59,6 +59,7 @@ export default class Session extends React.Component {
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
   localSessionData = null;
   lastImageIndexSession = -1;
+  hasUserClicked = false;
   preloadImages = imgs => {
     console.log("preloadImages " + imgs.length);
     this.preloadedImages = [imgs.length];
@@ -66,21 +67,25 @@ export default class Session extends React.Component {
       this.preloadedImages[i] = new Image();
       this.preloadedImages[i].src = imgs[i];
     }
+    console.log("FINISHED LOADING!!!!!!!!!");
   };
   showWaitingProgressBar = () => {
     let colorBefore = this.state.sessionColor;
-    this.setState({
-      sessionColor: "Black",
-      progressBarPercent: 100,
-      progressBarTransition: "smooth"
-    });
-    setTimeout(() => {
-      this.setState({
-        sessionColor: colorBefore,
-        progressBarTransition: "hard",
-        progressBarPercent: 0
-      });
-    }, GLOBAL_VARS.timeLimit - 2);
+    this.setState(
+      {
+        sessionColor: "Black",
+        progressBarPercent: 100,
+        progressBarTransition: "smooth"
+      },
+      () =>
+        setTimeout(() => {
+          this.setState({
+            sessionColor: colorBefore,
+            progressBarTransition: "hard",
+            progressBarPercent: 0
+          });
+        }, GLOBAL_VARS.timeLimit - 2)
+    );
   };
 
   changeRating = (newRating, name) => {
@@ -92,14 +97,20 @@ export default class Session extends React.Component {
 
   setNewImage = imgIdx => {
     console.log("Showing Image " + imgIdx + "/" + this.lastImageIndexSession);
-    this.setState({
-      currLocInSession: imgIdx,
-      timeBefore: Date.now(),
-      currImageSrc: this.localSessionData.imagesPath[imgIdx],
-      rating: -1,
-      timesUncertain: -1,
-      progressBarPercent: 0
-    });
+    this.setState(
+      {
+        currLocInSession: imgIdx,
+        timeBefore: Date.now(),
+        currImageSrc: this.localSessionData.imagesPath[imgIdx],
+        rating: -1,
+        timesUncertain: -1,
+        progressBarPercent: 0
+      },
+      () => {
+        // after the image has been changed, enable clicking again
+        this.hasUserClicked = false;
+      }
+    );
   };
   setNewSessionState = () => {
     this.setState({
@@ -132,18 +143,28 @@ export default class Session extends React.Component {
     this.sessionNum += 1;
     if (this.sessionNum < 2) {
       console.log("FINISHED SESSION");
-      let lastSessionType = this.state.sessionType;
+      let nextSessionType =
+        this.state.sessionType === this.tasks[0]
+          ? this.tasks[1]
+          : this.tasks[0];
+      let nextSessionColor =
+        this.state.sessionColor === "green" ? "red" : "green";
+      let spanStyle = { color: nextSessionColor };
       this.resetSessionState();
       this.setState({
-        sessionStatus: "Great! next session is going to start.."
+        sessionStatus: (
+          <div>
+            Nice! you have done great!
+            <br />
+            The Next session is:
+            <br />
+            <span style={spanStyle}>{nextSessionType}</span>
+          </div>
+        )
       });
       this.showWaitingProgressBar();
       setTimeout(() => {
         // continue for second round
-        let nextSessionType =
-          lastSessionType === this.tasks[0] ? this.tasks[1] : this.tasks[0];
-        let nextSessionColor =
-          this.state.sessionColor === "green" ? "red" : "green";
         this.getSessionByType(nextSessionType);
         this.setState({
           sessionType: nextSessionType,
@@ -302,10 +323,16 @@ export default class Session extends React.Component {
   };
   onSubmitRating = e => {
     e.preventDefault();
-    if (this.localSessionData === null || this.state.rating === -1) {
+    console.log("onSubmitRating: hasUserClicked:", this.hasUserClicked);
+    if (
+      this.localSessionData === null ||
+      this.hasUserClicked ||
+      this.state.rating === -1
+    ) {
       console.log("this.state.rating === -1");
       return;
     }
+    this.hasUserClicked = true;
     this.sendRatingToBackend(this.createRating(true));
   };
   onStarHover(nextValue, prevValue, name) {
@@ -369,7 +396,7 @@ export default class Session extends React.Component {
               <div className="taskTitle">
                 {!this.state.isFinished &&
                 this.state.sessionType === "ATTRACTIVENESS" ? (
-                  <h2 style={{ color: "red" }}>How Attractive?</h2>
+                  <h2 style={{ color: "red" }}>Attractive?</h2>
                 ) : (
                   <h2 style={{ color: "green" }}>Would you give a loan?</h2>
                 )}
@@ -382,6 +409,8 @@ export default class Session extends React.Component {
                     src={this.state.currImageSrc}
                     className="displayedImage"
                   />
+                  //                   $("<img/>")
+                  //     .on('load', function() { console.log("image loaded correctly"); })  RUN A FUNCTION TO START SESSION.
                 )}
               </div>
 

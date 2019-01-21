@@ -13,6 +13,16 @@
   padding: 20px;
   color: white;
 }
+
+/* Disables the drag event 
+(mostly used for images) */
+.disabledrag {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
