@@ -418,7 +418,6 @@ export default class Session extends React.Component {
                   starRatedColor="gold"
                   starHoverColor="gold"
                   changeRating={this.changeRating}
-                  onStarHover={this.onStarHover.bind(this)}
                   numberOfStars={5}
                   name="rating"
                 />
