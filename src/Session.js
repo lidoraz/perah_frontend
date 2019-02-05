@@ -109,6 +109,8 @@ export default class Session extends React.Component {
       () => {
         // after the image has been changed, enable clicking again
         this.hasUserClicked = false;
+        console.log('setNewImage, setState finished');
+        this.render()
       }
     );
   };
