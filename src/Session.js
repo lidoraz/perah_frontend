@@ -93,6 +93,8 @@ export default class Session extends React.Component {
       timesUncertain: this.state.timesUncertain + 1,
       rating: newRating
     });
+    // workaround to fix an annoying mobile bug
+    document.elementFromPoint(0, 0).click();
   };
 
   setNewImage = imgIdx => {
@@ -109,8 +111,6 @@ export default class Session extends React.Component {
       () => {
         // after the image has been changed, enable clicking again
         this.hasUserClicked = false;
-        console.log('setNewImage, setState finished');
-        this.render()
       }
     );
   };
