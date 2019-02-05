@@ -45,7 +45,7 @@ export default class Session extends React.Component {
     currImageSrc: "",
     currLocInSession: 0,
     timeBefore: 0,
-    rating: -1,
+    rating: 0,
     timesUncertain: -1,
     sessionStatus: null,
     isFinished: false,
@@ -102,7 +102,7 @@ export default class Session extends React.Component {
         currLocInSession: imgIdx,
         timeBefore: Date.now(),
         currImageSrc: this.localSessionData.imagesPath[imgIdx],
-        rating: -1,
+        rating: 0,
         timesUncertain: -1,
         progressBarPercent: 0
       },
@@ -327,7 +327,7 @@ export default class Session extends React.Component {
     if (
       this.localSessionData === null ||
       this.hasUserClicked ||
-      this.state.rating === -1
+      this.state.rating === 0
     ) {
       console.log("this.state.rating === -1");
       return;
@@ -335,9 +335,7 @@ export default class Session extends React.Component {
     this.hasUserClicked = true;
     this.sendRatingToBackend(this.createRating(true));
   };
-  onStarHover(nextValue, prevValue, name) {
-    this.setState({ rating: nextValue });
-  }
+
   startSessions = userId => {
     console.log("startSessions" + userId);
     let local = null,
