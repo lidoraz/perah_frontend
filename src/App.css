@@ -86,8 +86,8 @@ body {
   height: 35px;
 }
 .taskTitle {
-  margin-bottom: 2em;
-  margin-top: 2em;
+  margin-bottom: 1em;
+  margin-top: 1em;
 }
 .submitRatingButtonA {
   background-color: red;
