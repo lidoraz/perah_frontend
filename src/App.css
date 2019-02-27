@@ -79,7 +79,7 @@ body {
   font-size: 16px;
   height: 40px;
   width: 200px;
-  margin-top: 25px;
+  margin-top: 20px;
 }
 .button {
   font-size: 15px;
@@ -87,7 +87,7 @@ body {
 }
 .taskTitle {
   margin-bottom: 2em;
-  margin-top: 2.5em;
+  margin-top: 2em;
 }
 .submitRatingButtonA {
   background-color: red;
@@ -96,7 +96,7 @@ body {
   font-size: 16px;
   height: 40px;
   width: 200px;
-  margin-top: 25px;
+  margin-top: 20px;
 }
 .rating-stars {
   margin-left: 0px;
