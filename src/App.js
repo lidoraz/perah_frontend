@@ -34,7 +34,7 @@ class App extends Component {
           <div className="disabledrag">
             <div className="app-container">
               {!this.state.isLoggedIn ? (
-                <div>
+                <div className="TOP_login">
                   <h1>Welcome to Perah App!</h1>
                   <h2>Login or register to start</h2>
                   <div className="loginRegisterContainer">

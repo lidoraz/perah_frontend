@@ -1,43 +1,9 @@
 import React from "react";
 import axios from "axios";
 import StarRatings from "react-star-ratings";
-// import { ProgressBar } from "cjs-react-progressbar";
 import GLOBAL_VARS from "./Consts";
-//export default
-// class Foo extends React.Component {
-//   state = {
-//     rating: 0
-//   };
 
-// }
-const Filler = props => {
-  //"width 0.02s ease-in";
-  let transitionHard = "";
-  let transitionSmooth = "width " + GLOBAL_VARS.timeLimit + "ms ease-in";
-  let chosenTransition =
-    props.transition == "smooth" ? transitionSmooth : transitionHard;
-  return (
-    <div
-      className="filler"
-      style={{
-        width: props.percentage + "%",
-        background: props.color,
-        transition: chosenTransition
-      }}
-    />
-  );
-};
-const ProgressBar = props => {
-  return (
-    <div className="progress-bar">
-      <Filler
-        percentage={props.percentage}
-        color={props.color}
-        transition={props.transition}
-      />
-    </div>
-  );
-};
+import { ProgressBar } from "./helper";
 
 export default class Session extends React.Component {
   state = {
@@ -45,7 +11,7 @@ export default class Session extends React.Component {
     currImageSrc: "",
     currLocInSession: 0,
     timeBefore: 0,
-    rating: 0,
+    rating: -1,
     timesUncertain: -1,
     sessionStatus: null,
     isFinished: false,
@@ -54,7 +20,8 @@ export default class Session extends React.Component {
     showHello: false,
     progressBarPercent: 0,
     sessionColor: null,
-    progressBarTransition: "hard"
+    progressBarTransition: "hard",
+    inSession: false
   };
   tasks = ["ATTRACTIVENESS", "WILLING_FOR_LOAN"];
   localSessionData = null;
@@ -67,7 +34,7 @@ export default class Session extends React.Component {
       this.preloadedImages[i] = new Image();
       this.preloadedImages[i].src = imgs[i];
     }
-    console.log("FINISHED LOADING!!!!!!!!!");
+    console.log("FINISHED LOADING IMAGES");
   };
   showWaitingProgressBar = () => {
     let colorBefore = this.state.sessionColor;
@@ -93,8 +60,6 @@ export default class Session extends React.Component {
       timesUncertain: this.state.timesUncertain + 1,
       rating: newRating
     });
-    // workaround to fix an annoying mobile bug
-    document.elementFromPoint(0, 0).click();
   };
 
   setNewImage = imgIdx => {
@@ -104,7 +69,7 @@ export default class Session extends React.Component {
         currLocInSession: imgIdx,
         timeBefore: Date.now(),
         currImageSrc: this.localSessionData.imagesPath[imgIdx],
-        rating: 0,
+        rating: -1,
         timesUncertain: -1,
         progressBarPercent: 0
       },
@@ -117,7 +82,8 @@ export default class Session extends React.Component {
   setNewSessionState = () => {
     this.setState({
       sessionType: this.localSessionData.sessionType,
-      sessionStatus: ""
+      sessionStatus: "",
+      inSession: true
     });
   };
   resetSessionState = () => {
@@ -162,7 +128,8 @@ export default class Session extends React.Component {
             <br />
             <span style={spanStyle}>{nextSessionType}</span>
           </div>
-        )
+        ),
+        inSession: false
       });
       this.showWaitingProgressBar();
       setTimeout(() => {
@@ -215,6 +182,7 @@ export default class Session extends React.Component {
             this.setState({
               progressBarPercent: newPercent
             });
+            console.log("this.state.rating:", this.state.rating);
           }
         }
       }, percentOF4Seconds);
@@ -329,7 +297,7 @@ export default class Session extends React.Component {
     if (
       this.localSessionData === null ||
       this.hasUserClicked ||
-      this.state.rating === 0
+      this.state.rating === -1
     ) {
       console.log("this.state.rating === -1");
       return;
@@ -337,7 +305,9 @@ export default class Session extends React.Component {
     this.hasUserClicked = true;
     this.sendRatingToBackend(this.createRating(true));
   };
-
+  onStarHover(nextValue, prevValue, name) {
+    this.setState({ rating: nextValue });
+  }
   startSessions = userId => {
     console.log("startSessions" + userId);
     let local = null,
@@ -388,17 +358,24 @@ export default class Session extends React.Component {
         {this.state.isFinished && <h4>Click on the button below for more!</h4>}
 
         {this.state.showHello ? (
-          <h1>Hello {this.state.user_id}!</h1>
+          <h1>Hello user {this.state.user_id}!</h1>
         ) : (
           !this.state.isFinished &&
           this.state.sessionType && (
             <div className="innerSessionHolder">
               <div className="taskTitle">
-                {!this.state.isFinished &&
+                {this.state.inSession &&
                 this.state.sessionType === "ATTRACTIVENESS" ? (
-                  <h2 style={{ color: "red" }}>Attractive?</h2>
+                  <h2 style={{ color: "red" }}>
+                    How Attractive? &nbsp;({this.state.currLocInSession + 1}/
+                    {this.lastImageIndexSession + 1})
+                  </h2>
                 ) : (
-                  <h2 style={{ color: "green" }}>Would you give a loan?</h2>
+                  <h2 style={{ color: "green" }}>
+                    Will you give a loan? &nbsp;(
+                    {this.state.currLocInSession + 1}/
+                    {this.lastImageIndexSession + 1})
+                  </h2>
                 )}
               </div>
 
@@ -409,17 +386,24 @@ export default class Session extends React.Component {
                     src={this.state.currImageSrc}
                     className="displayedImage"
                   />
-                  //                   $("<img/>")
-                  //     .on('load', function() { console.log("image loaded correctly"); })  RUN A FUNCTION TO START SESSION.
                 )}
               </div>
 
               <div className="starSubmitContainer">
                 <StarRatings
                   rating={this.state.rating}
-                  starRatedColor="gold"
-                  starHoverColor="gold"
+                  starRatedColor={
+                    this.state.sessionType === "ATTRACTIVENESS"
+                      ? "#df2020"
+                      : "#20df20"
+                  }
+                  starHoverColor={
+                    this.state.sessionType === "ATTRACTIVENESS"
+                      ? "#d35f5f"
+                      : "#4ce64c"
+                  }
                   changeRating={this.changeRating}
+                  onStarHover={this.onStarHover.bind(this)}
                   numberOfStars={5}
                   name="rating"
                 />

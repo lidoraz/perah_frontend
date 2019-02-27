@@ -8,11 +8,18 @@ export default class Login extends React.Component {
     sessionType: null,
     showLogin: false
   };
+
   change = event => {
-    this.setState({
-      user_id: event.target.value,
-      currRating: event.target.value
-    });
+    var goodChars = "0123456789";
+    if (
+      goodChars.includes(event.target.value[event.target.value.length - 1]) ||
+      event.target.value.length == 0
+    ) {
+      this.setState({
+        user_id: event.target.value,
+        currRating: event.target.value
+      });
+    }
   };
   onSubmitLogin = e => {
     e.preventDefault();
@@ -36,7 +43,6 @@ export default class Login extends React.Component {
               <input
                 name="user_id"
                 placeholder="ID"
-                type="number"
                 min="010000000"
                 max="999999999"
                 value={this.state.user_id}
