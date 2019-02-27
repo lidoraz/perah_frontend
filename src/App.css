@@ -227,6 +227,11 @@ body {
   vertical-align: middle;
   border-bottom: 2px solid #123456;
 }
+
+.dv-star-rating-star {
+  font-size: 700% !important;
+}
+
 .divTableHeading {
   background-color: #eee;
   display: table-header-group;
@@ -243,6 +248,7 @@ body {
 
 /* sembiraben@gmail.com+ */
 input {
+  font-size: 120%;
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
