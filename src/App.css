@@ -79,7 +79,7 @@ body {
   font-size: 16px;
   height: 40px;
   width: 200px;
-  margin-top: 20px;
+  margin-top: 2%;
 }
 .button {
   font-size: 15px;
@@ -96,7 +96,7 @@ body {
   font-size: 16px;
   height: 40px;
   width: 200px;
-  margin-top: 20px;
+  margin-top: 2%;
 }
 .rating-stars {
   margin-left: 0px;
@@ -123,12 +123,13 @@ body {
   /* transition: width 0.05s ease-in; */
 }
 
-@media (min-width: 320px) {
-  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
-  /* .sessionHolder {
-    position: relative;
-  } */
+/* @media (hover: none) {
+  a:hover {
+    color: inherit;
+  }
+} */
 
+@media (min-width: 320px) {
   h2 {
     margin: 0 !important;
     padding: 0 !important;
@@ -156,10 +157,52 @@ body {
   }
   /*needed to display the star and rate button on mobile phones*/
   .starSubmitContainer {
-    height: 21%;
     position: fixed;
     bottom: 0%;
     width: 100%;
+    margin-bottom: 3%;
+  }
+  .divTable {
+    display: table;
+    margin: auto;
+    /* position: relative; */
+    width: 100%;
+    float: center;
+  }
+}
+/* iphone X */
+@media only screen and (min-device-width: 375px) and (max-device-height: 812px) {
+  h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .displayedImage {
+    width: 100%;
+    /* padding-left: 3px; */
+    /* padding-right: 3px; */
+    /* border-style: solid; */
+    /* border-color: darkgray;
+    border-width: 0px 2px 0px 2px; */
+
+    -webkit-box-shadow: 0px 40px 106px -33px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0px 40px 106px -33px rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 40px 106px -33px rgba(0, 0, 0, 0.4);
+  }
+  .app-container {
+    float: center;
+    margin: 0%;
+    width: 100%;
+  }
+
+  .h2 {
+    margin: 0;
+  }
+  /*needed to display the star and rate button on mobile phones*/
+  .starSubmitContainer {
+    position: fixed;
+    bottom: 0%;
+    width: 100%;
+    margin-bottom: 25%;
   }
   .divTable {
     display: table;
@@ -228,8 +271,11 @@ body {
   border-bottom: 2px solid #123456;
 }
 
+/* For StarRatingComponent*/
 .dv-star-rating-star {
-  font-size: 700% !important;
+  font-size: 370% !important;
+  padding: 5px !important;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
 .divTableHeading {
@@ -316,25 +362,38 @@ label {
   padding: 6px 1px;
 }
 
-label:hover {
+/* label:hover {
   background-color: rgba(185, 167, 144, 0.363);
+} */
+label:hover {
+  background-color: lightgray;
 }
-
+label:active {
+  color: black;
+}
+label:focus {
+  outline: none;
+  background-color: black;
+}
 input[type="radio"]:checked + label {
   color: lighten(bisque, 60%);
   background: rgb(185, 167, 144);
 }
-
-label + input[type="radio"] + label {
-  border-left: solid 2px rgb(185, 167, 144);
+input[type="radio"]:checked + label {
+  color: rgba(255, 255, 255, 0);
+  background: rgba(255, 255, 255, 0);
 }
-.radio-group {
+
+/* label + input[type="radio"] + label {
+  border-left: solid 2px rgb(185, 167, 144);
+} */
+/* .radio-group {
   border: solid 2px #b9a790;
   display: inline-block;
   margin: 10px;
   border-radius: 10px;
   overflow: hidden;
-}
+} */
 
 @import url("https://fonts.googleapis.com/css?family=Roboto");
 

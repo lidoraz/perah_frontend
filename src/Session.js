@@ -1,9 +1,10 @@
 import React from "react";
 import axios from "axios";
-import StarRatings from "react-star-ratings";
+// import StarRatings from "react-star-ratings";
+import StarRatingComponent from "react-star-rating-component";
 import GLOBAL_VARS from "./Consts";
 
-import { ProgressBar } from "./helper";
+import { ProgressBar, sendTouchBasic } from "./helper";
 
 export default class Session extends React.Component {
   state = {
@@ -54,13 +55,19 @@ export default class Session extends React.Component {
         }, GLOBAL_VARS.timeLimit - 2)
     );
   };
-
-  changeRating = (newRating, name) => {
+  onStarClick(nextValue, prevValue, name) {
     this.setState({
       timesUncertain: this.state.timesUncertain + 1,
-      rating: newRating
+      rating: nextValue
     });
-  };
+  }
+  // changeRating = (newRating, name) => {
+  //   this.setState({
+  //     timesUncertain: this.state.timesUncertain + 1,
+  //     rating: newRating
+  //   });
+  //   // sendTouchBasic();
+  // };
 
   setNewImage = imgIdx => {
     console.log("Showing Image " + imgIdx + "/" + this.lastImageIndexSession);
@@ -118,11 +125,16 @@ export default class Session extends React.Component {
       let nextSessionColor =
         this.state.sessionColor === "green" ? "red" : "green";
       let spanStyle = { color: nextSessionColor };
-      this.resetSessionState();
+
       this.setState({
         sessionStatus: (
           <div>
             Nice! you have done great!
+            {this.localSessionData.sessionId % 3 == 0 && (
+              <div>
+                This is your {this.localSessionData.sessionId} session , Great!
+              </div>
+            )}
             <br />
             The Next session is:
             <br />
@@ -131,6 +143,7 @@ export default class Session extends React.Component {
         ),
         inSession: false
       });
+      this.resetSessionState();
       this.showWaitingProgressBar();
       setTimeout(() => {
         // continue for second round
@@ -305,9 +318,7 @@ export default class Session extends React.Component {
     this.hasUserClicked = true;
     this.sendRatingToBackend(this.createRating(true));
   };
-  onStarHover(nextValue, prevValue, name) {
-    this.setState({ rating: nextValue });
-  }
+
   startSessions = userId => {
     console.log("startSessions" + userId);
     let local = null,
@@ -339,7 +350,7 @@ export default class Session extends React.Component {
   };
   render() {
     return (
-      <div className="sessionHolder">
+      <div className="sessionHolder" id="foo">
         {this.state.user_id == null &&
           this.startSessions(this.props.loggedUserId)}
         <div className="progressBar">
@@ -390,23 +401,34 @@ export default class Session extends React.Component {
               </div>
 
               <div className="starSubmitContainer">
-                <StarRatings
+                <StarRatingComponent
+                  starCount={5}
+                  value={this.state.rating}
+                  starColor={
+                    this.state.sessionType === "ATTRACTIVENESS"
+                      ? "#df2020"
+                      : "#00CA00"
+                  }
+                  onStarClick={this.onStarClick.bind(this)}
+                />
+                {/* <StarRatings
                   rating={this.state.rating}
                   starRatedColor={
                     this.state.sessionType === "ATTRACTIVENESS"
                       ? "#df2020"
-                      : "#20df20"
+                      : "#00CA00"
                   }
+                  /// see a way to disable this when in mobile phones
                   starHoverColor={
                     this.state.sessionType === "ATTRACTIVENESS"
-                      ? "#d35f5f"
-                      : "#4ce64c"
+                      ? "#df2020"
+                      : "#00CA00"
                   }
                   changeRating={this.changeRating}
                   onStarHover={this.onStarHover.bind(this)}
                   numberOfStars={5}
                   name="rating"
-                />
+                /> */}
 
                 <form>
                   <button
@@ -433,3 +455,11 @@ export default class Session extends React.Component {
     );
   }
 }
+
+// selected color:
+// ? "#df2020"
+// : "#20df20"
+
+// hover color:
+// ? "#d35f5f"
+//                       : "#4ce64c"
