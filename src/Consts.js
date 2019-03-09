@@ -1,6 +1,8 @@
 const GLOBAL_VARS = {
   // backendIP: "http://35.176.94.224:8080/",
-  backendIP: "http://132.72.80.41:8080/",
+  //backendIP: "http://132.72.80.41:8080/",
+  backendIP: "http://52.56.105.33:8080/", // Shushu ec2
+  
   // backendIP: "http://localhost:8080/",
   timeLimit: 5000,
   isTimeLimited: false,
